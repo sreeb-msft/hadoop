@@ -83,7 +83,35 @@
         </executions>
       </plugin>
 
-       <plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.6</version>
+        <configuration>
+          <excludes>
+            <exclude>org/apache/hadoop/fs/azure/**/*</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.reporting.outputDirectory}/${combName}/jacoco</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
@@ -100,7 +128,6 @@
           </execution>
         </executions>
        </plugin>
-
     </plugins>
 
 
@@ -137,7 +164,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-
   </build>
 
   <!-- see hadoop-project/pom.xml for version number declarations -->
@@ -374,7 +400,7 @@
                 <configuration>
                   <forkCount>${testsThreadCount}</forkCount>
                   <reuseForks>false</reuseForks>
-                  <argLine>${maven-surefire-plugin.argLine} -DminiClusterDedicatedDirs=true</argLine>
+                  <argLine>@{argLine} -DminiClusterDedicatedDirs=true</argLine>
                   <forkedProcessTimeoutInSeconds>${fs.azure.scale.test.timeout}</forkedProcessTimeoutInSeconds>
                   <systemPropertyVariables>
                     <test.build.data>${test.build.data}/${surefire.forkNumber}</test.build.data>
@@ -405,7 +431,7 @@
                 <configuration>
                   <forkCount>1</forkCount>
                   <reuseForks>false</reuseForks>
-                  <argLine>${maven-surefire-plugin.argLine} -DminiClusterDedicatedDirs=true</argLine>
+                  <argLine>@{argLine} -DminiClusterDedicatedDirs=true</argLine>
                   <forkedProcessTimeoutInSeconds>${fs.azure.scale.test.timeout}</forkedProcessTimeoutInSeconds>
                   <systemPropertyVariables>
                     <test.build.data>${test.build.data}/${surefire.forkNumber}</test.build.data>
@@ -439,7 +465,7 @@
                 <configuration>
                   <forkCount>${testsThreadCount}</forkCount>
                   <reuseForks>false</reuseForks>
-                  <argLine>${maven-surefire-plugin.argLine} -DminiClusterDedicatedDirs=true</argLine>
+                  <argLine>@{argLine} -DminiClusterDedicatedDirs=true</argLine>
                   <forkedProcessTimeoutInSeconds>${fs.azure.scale.test.timeout}</forkedProcessTimeoutInSeconds>
                   <trimStackTrace>false</trimStackTrace>
                   <systemPropertyVariables>
@@ -537,7 +563,7 @@
                 <configuration>
                   <forkCount>${testsThreadCount}</forkCount>
                   <reuseForks>false</reuseForks>
-                  <argLine>${maven-surefire-plugin.argLine} -DminiClusterDedicatedDirs=true</argLine>
+                  <argLine>@{argLine} -DminiClusterDedicatedDirs=true</argLine>
                   <forkedProcessTimeoutInSeconds>${fs.azure.scale.test.timeout}</forkedProcessTimeoutInSeconds>
                   <systemPropertyVariables>
                     <test.build.data>${test.build.data}/${surefire.forkNumber}</test.build.data>
@@ -574,7 +600,7 @@
                   <reuseForks>true</reuseForks>
                   <parallel>both</parallel>
                   <threadCount>${testsThreadCount}</threadCount>
-                  <argLine>${maven-surefire-plugin.argLine} -DminiClusterDedicatedDirs=true</argLine>
+                  <argLine>@{argLine} -DminiClusterDedicatedDirs=true</argLine>
                   <forkedProcessTimeoutInSeconds>${fs.azure.scale.test.timeout}</forkedProcessTimeoutInSeconds>
                   <trimStackTrace>false</trimStackTrace>
                   <systemPropertyVariables>
@@ -620,7 +646,7 @@
                   <forkCount>${testsThreadCount}</forkCount>
                   <reuseForks>false</reuseForks>
                   <!--NOTICE: hadoop contract tests methods can not be ran in parallel-->
-                  <argLine>${maven-surefire-plugin.argLine} -DminiClusterDedicatedDirs=true</argLine>
+                  <argLine>@{argLine} -DminiClusterDedicatedDirs=true</argLine>
                   <forkedProcessTimeoutInSeconds>${fs.azure.scale.test.timeout}</forkedProcessTimeoutInSeconds>
                   <trimStackTrace>false</trimStackTrace>
                   <systemPropertyVariables>
@@ -691,7 +717,7 @@
                 <configuration>
                   <forkCount>${testsThreadCount}</forkCount>
                   <reuseForks>false</reuseForks>
-                  <argLine>${maven-surefire-plugin.argLine} -DminiClusterDedicatedDirs=true</argLine>
+                  <argLine>@{argLine} -DminiClusterDedicatedDirs=true</argLine>
                   <forkedProcessTimeoutInSeconds>${fs.azure.scale.test.timeout}</forkedProcessTimeoutInSeconds>
                   <systemPropertyVariables>
                     <test.build.data>${test.build.data}/${surefire.forkNumber}</test.build.data>
@@ -721,7 +747,7 @@
                 <configuration>
                   <forkCount>1</forkCount>
                   <reuseForks>false</reuseForks>
-                  <argLine>${maven-surefire-plugin.argLine} -DminiClusterDedicatedDirs=true</argLine>
+                  <argLine>@{argLine} -DminiClusterDedicatedDirs=true</argLine>
                   <forkedProcessTimeoutInSeconds>${fs.azure.scale.test.timeout}</forkedProcessTimeoutInSeconds>
                   <systemPropertyVariables>
                     <test.build.data>${test.build.data}/${surefire.forkNumber}</test.build.data>
@@ -755,7 +781,7 @@
                 <configuration>
                   <forkCount>${testsThreadCount}</forkCount>
                   <reuseForks>false</reuseForks>
-                  <argLine>${maven-surefire-plugin.argLine} -DminiClusterDedicatedDirs=true</argLine>
+                  <argLine>@{argLine} -DminiClusterDedicatedDirs=true</argLine>
                   <forkedProcessTimeoutInSeconds>${fs.azure.scale.test.timeout}</forkedProcessTimeoutInSeconds>
                   <trimStackTrace>false</trimStackTrace>
                   <systemPropertyVariables>
