@@ -38,6 +38,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.classification.VisibleForTesting;
+import org.apache.hadoop.fs.azurebfs.contracts.exceptions.AbfsRestOperationException;
 import org.apache.hadoop.fs.store.LogExactlyOnce;
 import org.apache.hadoop.util.Preconditions;
 import org.apache.hadoop.thirdparty.com.google.common.base.Strings;
@@ -652,6 +653,9 @@ public class AbfsClient implements Closeable {
     addCustomerProvidedKeyHeaders(requestHeaders);
     // JDK7 does not support PATCH, so to workaround the issue we will use
     // PUT and specify the real method in the X-Http-Method-Override header.
+    if (reqParams.getIsExpectHeaderEnabled()) {
+      requestHeaders.add(new AbfsHttpHeader(EXPECT, HUNDRED_CONTINUE));
+    }
     requestHeaders.add(new AbfsHttpHeader(X_HTTP_METHOD_OVERRIDE,
         HTTP_METHOD_PATCH));
     if (reqParams.getLeaseId() != null) {
@@ -688,6 +692,18 @@ public class AbfsClient implements Closeable {
     try {
       op.execute(tracingContext);
     } catch (AzureBlobFileSystemException e) {
+      /*
+        If the http response code indicates a user error we retry the same append request with expect header disabled
+       */
+      if ((((AbfsRestOperationException) e).getStatusCode()
+          >= HttpURLConnection.HTTP_BAD_REQUEST
+          && ((AbfsRestOperationException) e).getStatusCode()
+              < HttpURLConnection.HTTP_INTERNAL_ERROR)
+          && reqParams.getIsExpectHeaderEnabled()) {
+        reqParams.setExpectHeaderEnabled(false);
+        return this.append(path, buffer, reqParams, cachedSasToken,
+            tracingContext);
+      }
       // If we have no HTTP response, throw the original exception.
       if (!op.hasResult()) {
         throw e;
@@ -1273,6 +1289,14 @@ public class AbfsClient implements Closeable {
     return abfsCounters;
   }
 
+  /**
+   * Getter for abfsConfiguration from AbfsClient.
+   * @return AbfsConfiguration instance
+   */
+  protected AbfsConfiguration getAbfsConfiguration() {
+    return abfsConfiguration;
+  }
+
   public int getNumLeaseThreads() {
     return abfsConfiguration.getNumLeaseThreads();
   }
@@ -1288,5 +1312,10 @@ public class AbfsClient implements Closeable {
 
   public <V> void addCallback(ListenableFuture<V> future, FutureCallback<V> callback) {
     Futures.addCallback(future, callback, executorService);
+  }
+
+  @VisibleForTesting
+  protected AccessTokenProvider getTokenProvider() {
+    return tokenProvider;
   }
 }

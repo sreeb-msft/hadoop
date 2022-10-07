@@ -303,7 +303,7 @@ public class AbfsRestOperation {
       LOG.warn("Unknown host name: {}. Retrying to resolve the host name...",
           hostname);
       if (!client.getRetryPolicy().shouldRetry(retryCount, -1)) {
-        throw new InvalidAbfsRestOperationException(ex);
+        throw new InvalidAbfsRestOperationException(ex, retryCount);
       }
       return false;
     } catch (IOException ex) {
@@ -312,7 +312,7 @@ public class AbfsRestOperation {
       }
 
       if (!client.getRetryPolicy().shouldRetry(retryCount, -1)) {
-        throw new InvalidAbfsRestOperationException(ex);
+        throw new InvalidAbfsRestOperationException(ex, retryCount);
       }
 
       return false;
@@ -327,7 +327,6 @@ public class AbfsRestOperation {
     }
 
     result = httpOperation;
-
     return true;
   }
 
