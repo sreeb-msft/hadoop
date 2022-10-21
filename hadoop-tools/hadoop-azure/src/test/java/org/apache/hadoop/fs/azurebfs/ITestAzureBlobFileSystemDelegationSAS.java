@@ -26,9 +26,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.hadoop.fs.azurebfs.extensions.MockSASTokenProvider;
+import org.apache.hadoop.fs.azurebfs.services.*;
 import org.assertj.core.api.Assertions;
 import org.junit.Assume;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.internal.verification.Times;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +44,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.azurebfs.constants.AbfsHttpConstants;
 import org.apache.hadoop.fs.azurebfs.constants.TestConfigurationKeys;
 import org.apache.hadoop.fs.azurebfs.extensions.MockDelegationSASTokenProvider;
-import org.apache.hadoop.fs.azurebfs.services.AbfsHttpOperation;
-import org.apache.hadoop.fs.azurebfs.services.AbfsRestOperation;
-import org.apache.hadoop.fs.azurebfs.services.AuthType;
 import org.apache.hadoop.fs.permission.AclEntry;
 import org.apache.hadoop.fs.permission.AclEntryScope;
 import org.apache.hadoop.fs.permission.AclStatus;
@@ -479,4 +480,24 @@ public class ITestAzureBlobFileSystemDelegationSAS extends AbstractAbfsIntegrati
         "r--r-----",
         fileStatus.getPermission().toString());
   }
+
+  @Test
+  public void testNoUnwantedPrefix() throws Exception {
+    AzureBlobFileSystem fs = getFileSystem();
+    fs.getConf().set("fs.azure.sas.token.provider.type", "org.apache.hadoop.fs.azurebfs.extensions.MockSASTokenProvider");
+    createFilesystemForSASTests();
+
+    Path reqPath = new Path(UUID.randomUUID().toString());
+
+    fs.create(reqPath).close();
+
+    final String propertyName = "user.mime_type";
+    final byte[] propertyValue = "text/plain".getBytes("utf-8");
+    fs.setXAttr(reqPath, propertyName, propertyValue);
+
+    Mockito.verify(MockSASTokenProvider.str.substring(1), new Times(1));
+  }
+
 }
+
+

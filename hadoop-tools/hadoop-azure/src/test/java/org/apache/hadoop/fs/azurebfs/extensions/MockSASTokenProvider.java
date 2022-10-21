@@ -26,6 +26,7 @@ import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.fs.azurebfs.AbfsConfiguration;
 import org.apache.hadoop.fs.azurebfs.utils.Base64;
 import org.apache.hadoop.fs.azurebfs.utils.ServiceSASGenerator;
+import org.mockito.Mockito;
 
 /**
  * A mock SAS token provider implementation
@@ -35,6 +36,8 @@ public class MockSASTokenProvider implements SASTokenProvider {
   private byte[] accountKey;
   private ServiceSASGenerator generator;
   private boolean skipAuthorizationForTestSetup = false;
+
+  public static String str;
 
   // For testing we use a container SAS for all operations.
   private String generateSAS(byte[] accountKey, String accountName, String fileSystemName) {
@@ -70,8 +73,9 @@ public class MockSASTokenProvider implements SASTokenProvider {
       throw new AccessControlException(
           "The user is not authorized to perform this operation.");
     }
-
-    return generateSAS(accountKey, accountName, fileSystem);
+    String sasToken = Mockito.spy("?"+generateSAS(accountKey, accountName, fileSystem));
+    str = sasToken;
+    return sasToken;
   }
 
   public boolean isSkipAuthorizationForTestSetup() {
