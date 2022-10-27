@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.hadoop.fs.azurebfs.constants.ConfigurationKeys;
 import org.apache.hadoop.fs.azurebfs.extensions.MockSASTokenProvider;
 import org.apache.hadoop.fs.azurebfs.services.*;
 import org.assertj.core.api.Assertions;
@@ -483,19 +484,12 @@ public class ITestAzureBlobFileSystemDelegationSAS extends AbstractAbfsIntegrati
 
   @Test
   public void testNoUnwantedPrefix() throws Exception {
-    AzureBlobFileSystem fs = getFileSystem();
-    fs.getConf().set("fs.azure.sas.token.provider.type", "org.apache.hadoop.fs.azurebfs.extensions.MockSASTokenProvider");
-    createFilesystemForSASTests();
+    this.getConfiguration().set(FS_AZURE_SAS_TOKEN_PROVIDER_TYPE, "org.apache.hadoop.fs.azurebfs.extensions.MockPrefixSASTokenProvider");
 
-    Path reqPath = new Path(UUID.randomUUID().toString());
-
-    fs.create(reqPath).close();
-
-    final String propertyName = "user.mime_type";
-    final byte[] propertyValue = "text/plain".getBytes("utf-8");
-    fs.setXAttr(reqPath, propertyName, propertyValue);
-
-    Mockito.verify(MockSASTokenProvider.str.substring(1), new Times(1));
+    AzureBlobFileSystem testFs = (AzureBlobFileSystem) FileSystem.newInstance(getRawConfiguration());
+    Path testFile = new Path("/testSASPrefixQuesMark");
+    testFs.create(testFile).close();
+    testFs.getFileStatus(testFile);
   }
 
 }

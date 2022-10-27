@@ -73,9 +73,7 @@ public class MockSASTokenProvider implements SASTokenProvider {
       throw new AccessControlException(
           "The user is not authorized to perform this operation.");
     }
-    String sasToken = Mockito.spy("?"+generateSAS(accountKey, accountName, fileSystem));
-    str = sasToken;
-    return sasToken;
+    return generateSAS(accountKey, accountName, fileSystem);
   }
 
   public boolean isSkipAuthorizationForTestSetup() {
