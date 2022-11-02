@@ -37,8 +37,6 @@ public class MockSASTokenProvider implements SASTokenProvider {
   private ServiceSASGenerator generator;
   private boolean skipAuthorizationForTestSetup = false;
 
-  public static String str;
-
   // For testing we use a container SAS for all operations.
   private String generateSAS(byte[] accountKey, String accountName, String fileSystemName) {
      return generator.getContainerSASWithFullControl(accountName, fileSystemName);
