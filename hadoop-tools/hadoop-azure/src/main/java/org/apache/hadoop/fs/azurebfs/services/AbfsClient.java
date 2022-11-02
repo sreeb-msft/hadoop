@@ -1106,12 +1106,6 @@ public class AbfsClient implements Closeable {
     return directory;
   }
 
-  public String removeSASTokenPrefix(String sasToken) {
-    if(sasToken.charAt(0) == '?') {
-      return sasToken.substring(1);
-    }
-    return sasToken;
-  }
   /**
    * If configured for SAS AuthType, appends SAS token to queryBuilder
    * @param path
@@ -1152,7 +1146,8 @@ public class AbfsClient implements Closeable {
           sasToken = cachedSasToken;
           LOG.trace("Using cached SAS token.");
         }
-        if(sasToken.charAt(0) == '?') {
+        // remove unwanted prefix of ? from SAS Token if present
+        if (sasToken.charAt(0) == '?') {
           sasToken = sasToken.substring(1);
         }
         queryBuilder.setSASToken(sasToken);
