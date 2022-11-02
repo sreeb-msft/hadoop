@@ -18,6 +18,7 @@
 
 package org.apache.hadoop.fs.azurebfs;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
@@ -487,9 +488,12 @@ public class ITestAzureBlobFileSystemDelegationSAS extends AbstractAbfsIntegrati
     AzureBlobFileSystem testFs = (AzureBlobFileSystem) FileSystem.newInstance(getRawConfiguration());
     Path testFile = new Path("/testSASPrefixQuesMark");
     testFs.create(testFile).close();
-    testFs.getFileStatus(testFile);
+    try {
+      testFs.getFileStatus(testFile);
+    } catch (FileNotFoundException e) {
+      fail("File should be created accurately. An Exception is not expected.");
+    }
   }
-
 }
 
 
