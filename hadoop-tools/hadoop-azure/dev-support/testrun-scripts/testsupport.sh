@@ -69,10 +69,14 @@ ENDOFFILE
     STARTTIME=$(date +%s)
     testlogfilename="$testOutputLogFolder/Test-Logs-$combination.txt"
     touch "$testlogfilename"
+    combcoverage="$coveragedir/$combination"
+    mkdir "$combcoverage"
     echo "Running test for combination $combination on account $accountName [ProcessCount=$processcount]"
     echo "Result can be seen in $testlogfilename"
     mvn -T 1C -DcombName="$combination" -Dparallel-tests=abfs -Dscale -DtestsThreadCount="$processcount" verify >> "$testlogfilename" || true
     ENDTIME=$(date +%s)
+    cp -r "target/site/jacoco" $combcoverage
+    rm -rf "target/site"
     summary
   fi
 
@@ -137,7 +141,9 @@ init() {
   fi
   starttime=$(date +"%Y-%m-%d_%H-%M-%S")
   testOutputLogFolder+=$starttime
+  coveragedir="$testOutputLogFolder/Coverage-reports"
   mkdir -p "$testOutputLogFolder"
+  mkdir -p "$coveragedir"
   aggregatedTestResult="$testOutputLogFolder/Test-Results.txt"
  }
 

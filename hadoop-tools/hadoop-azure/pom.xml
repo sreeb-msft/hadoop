@@ -105,7 +105,7 @@
               <goal>report</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.reporting.outputDirectory}/${combName}/jacoco</outputDirectory>
+              <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
             </configuration>
           </execution>
         </executions>
