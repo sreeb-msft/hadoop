@@ -322,7 +322,15 @@ public class TestExponentialRetryPolicy extends AbstractAbfsIntegrationTest {
             requestHeaders));
 
     // setting up mock behavior for the AbfsHttpOperation class
-    AbfsHttpOperation mockHttpOp = Mockito.spy(mockRestOp.createHttpOperationInstance());
+    AbfsHttpOperation mockHttpOp = Mockito.mock(AbfsHttpOperation.class);
+
+    HttpURLConnection connection = Mockito.mock(HttpURLConnection.class);
+    Mockito.doNothing().when(connection).setRequestProperty(Mockito.anyString(), Mockito.anyString());
+
+    Mockito.doReturn(connection).when(mockHttpOp).getConnection();
+    Mockito.doReturn(mockHttpOp).when(mockRestOp).createHttpOperationInstance();
+    Mockito.doReturn(mockHttpOp).when(mockRestOp).getResult();
+
     Mockito.doReturn(HTTP_OK)
             .when(mockHttpOp).getStatusCode();
     Mockito.doNothing().when(mockHttpOp).setRequestProperty(nullable(String.class), nullable(String.class));
@@ -331,9 +339,6 @@ public class TestExponentialRetryPolicy extends AbstractAbfsIntegrationTest {
             .doThrow(IOException.class)
             .doThrow(IOException.class)
             .doNothing().when(mockHttpOp).processResponse(nullable(byte[].class), nullable(int.class), nullable(int.class));
-
-    Mockito.doReturn(mockHttpOp).when(mockRestOp).createHttpOperationInstance();
-    Mockito.doReturn(mockHttpOp).when(mockRestOp).getResult();
 
     mockRestOp.execute(getTestTracingContext(fs, false));
     Mockito.verify(intercept, times(1)).sendingRequest(Mockito.any(AbfsRestOperationType.class), Mockito.any(AbfsCounters.class));
