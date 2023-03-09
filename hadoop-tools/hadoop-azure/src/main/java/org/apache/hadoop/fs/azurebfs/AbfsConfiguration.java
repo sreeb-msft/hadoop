@@ -836,9 +836,11 @@ public class AbfsConfiguration{
   public double getSleepIncreaseFactor() {
     return sleepIncreaseFactor;
   }
+
   public boolean shouldThrottleRetriedRequests() {
     return throttleRetries;
   }
+
   public int getRateLimit() {
     return rateLimit;
   }
